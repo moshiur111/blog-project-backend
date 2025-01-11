@@ -4,9 +4,12 @@ import { ErrorRequestHandler } from 'express';
 import { TErrorSources } from '../interface/error';
 import { ZodError } from 'zod';
 import handleZodError from '../error/handleZodError';
-import handleValidationError from './handleValidationError';
+import handleValidationError from '../error/handleValidationError';
 import AppError from '../error/AppError';
 import config from '../config';
+import notFoundError from '../error/notFoundError';
+import authenticationError from '../error/authenticationError';
+import authorizationError from '../error/authorizationError';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = 500;
@@ -43,6 +46,41 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
       {
         path: '',
         message: err?.message,
+      },
+    ];
+  } else if (err instanceof notFoundError) {
+    statusCode = err.statusCode;
+    message = err.message;
+    errorSources = [
+      {
+        path: '',
+        message: err.message,
+      },
+    ];
+  } else if (err instanceof authenticationError) {
+    statusCode = err.statusCode;
+    message = err.message;
+    errorSources = [
+      {
+        path: '',
+        message: err.message,
+      },
+    ];
+  } else if (err instanceof authorizationError) {
+    statusCode = err.statusCode;
+    message = err.message;
+    errorSources = [
+      {
+        path: '',
+        message: err.message,
+      },
+    ];
+  } else {
+    message = err?.message || 'Internal Server Error';
+    errorSources = [
+      {
+        path: '',
+        message: err?.message || 'An unexpected error occured',
       },
     ];
   }
