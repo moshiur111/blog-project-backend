@@ -5,12 +5,15 @@ import { TLogingUser, TRegisterUser } from './auth.interface';
 import { createToken } from './auth.utils';
 
 const registerUser = async (payload: TRegisterUser) => {
-  const user = await User.create(payload);
-  return user;
+  const user = await User.isUserExistsByEmail(payload?.email);
+  if (user) {
+    throw new AppError('User is already exists', 400);
+  }
+  const NewUser = await User.create(payload);
+  return NewUser;
 };
 
 const loginUser = async (payload: TLogingUser) => {
-  // const user = await User.findOne({email: payload.email})
   const user = await User.isUserExistsByEmail(payload?.email);
 
   if (!user) {
@@ -18,11 +21,11 @@ const loginUser = async (payload: TLogingUser) => {
   }
 
   const isBlocked = user?.isBlocked;
+
   if (isBlocked) {
     throw new AppError('This user is blocked', 403);
   }
 
-  console.log(user.password);
 
   if (!(await User.isPasswordMatched(payload?.password, user.password))) {
     throw new AppError('This password is not matched', 403);
@@ -39,7 +42,7 @@ const loginUser = async (payload: TLogingUser) => {
     config.jwt_access_expires_in as string,
   );
 
-  return accessToken
+  return accessToken;
 };
 
 export const AuthServices = {
