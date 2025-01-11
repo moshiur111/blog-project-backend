@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { model, Schema } from 'mongoose';
-import { TUser } from './user.interface';
+import { TUser, UserModel } from './user.interface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
-const userSchema = new Schema<TUser>(
+const userSchema = new Schema<TUser, UserModel>(
   {
     name: {
       type: String,
@@ -25,6 +28,7 @@ const userSchema = new Schema<TUser>(
     password: {
       type: String,
       required: [true, 'Password is required'],
+      select: 0,
     },
     role: {
       type: String,
@@ -44,5 +48,29 @@ const userSchema = new Schema<TUser>(
   },
 );
 
+userSchema.pre('save', async function (next) {
+  const user = this;
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
 
-export const User = model<TUser>('User', userSchema)
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+userSchema.statics.isUserExistsByEmail = async function (email: string) {
+  return User.findOne({ email }).select('+password');
+};
+
+userSchema.statics.isPasswordMatched = async function (
+  plainTextPassword,
+  hasedPassword,
+) {
+  return await bcrypt.compare(plainTextPassword, hasedPassword);
+};
+
+export const User = model<TUser, UserModel>('User', userSchema);
