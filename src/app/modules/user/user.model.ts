@@ -10,7 +10,7 @@ const userSchema = new Schema<TUser, UserModel>(
       type: String,
       required: [true, 'Full name is required'],
       trim: true,
-      maxlength: [100, 'Full name can not more than 100 characters'],
+      maxlength: [50, 'Full name can not more than 50 characters'],
     },
     email: {
       type: String,
