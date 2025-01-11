@@ -21,8 +21,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
       config.jwt_access_secret as string,
     ) as JwtPayload;
 
-    console.log('From Auth =>', decoded);
-
     const { role, userId } = decoded;
 
     const user = await User.findById(userId);
