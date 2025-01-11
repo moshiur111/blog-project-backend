@@ -3,7 +3,7 @@ import sendResponse from '../../utils/sendResponse';
 import { BlogServices } from './blog.service';
 
 const createBlog = catchAsync(async (req, res) => {
-  const newBlog = await BlogServices.createBlog(req.body);
+  const newBlog = await BlogServices.createBlog(req.user, req.body);
 
   sendResponse(res, {
     success: true,
@@ -15,7 +15,7 @@ const createBlog = catchAsync(async (req, res) => {
 
 const updateBlog = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const updatedBlog = await BlogServices.updateBlog(id, req.body);
+  const updatedBlog = await BlogServices.updateBlog(id, req.user, req.body);
 
   sendResponse(res, {
     success: true,
@@ -27,7 +27,7 @@ const updateBlog = catchAsync(async (req, res) => {
 
 const deleteBlog = catchAsync(async (req, res) => {
   const { id } = req.params;
-  await BlogServices.deleteBlog(id);
+  await BlogServices.deleteBlog(req.user, id);
 
   sendResponse(res, {
     success: true,
@@ -37,13 +37,13 @@ const deleteBlog = catchAsync(async (req, res) => {
 });
 
 const getAllBlogs = catchAsync(async (req, res) => {
-  const allBlogs = await BlogServices.getAllBlogs();
+  const allBlogs = await BlogServices.getAllBlogs(req.query);
 
   sendResponse(res, {
     success: true,
-    message: "Blogs fetched successfully",
+    message: 'Blogs fetched successfully',
     statusCode: 200,
-    data: allBlogs
+    data: allBlogs,
   });
 });
 
