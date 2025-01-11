@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 class AppError extends Error {
   public statusCode: number;
   constructor(message: string, statusCode: number, stack?: '') {

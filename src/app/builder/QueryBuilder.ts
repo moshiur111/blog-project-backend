@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Query } from 'mongoose';
 
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
-  public query: Record<string, unknown>;
+  public query: Record<string, any>;
 
-  constructor(modelQuery: Query<T[], T>, query: Record<string, unknown>) {
+  constructor(modelQuery: Query<T[], T>, query: Record<string, any>) {
     this.modelQuery = modelQuery;
     this.query = query;
   }

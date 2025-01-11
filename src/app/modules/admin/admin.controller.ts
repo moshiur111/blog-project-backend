@@ -8,7 +8,6 @@ const blockUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
 
   const user = await User.findById(userId)
-  console.log(user);
 
   if(!user) {
     throw new AppError("This user does not exists", 404);

@@ -11,7 +11,7 @@ import notFoundError from '../error/notFoundError';
 import authenticationError from '../error/authenticationError';
 import authorizationError from '../error/authorizationError';
 
-const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next): void => {
   let statusCode = 500;
   let message = 'Something went wrong!';
   let errorSources: TErrorSources = [
@@ -85,13 +85,15 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     ];
   }
 
-  return res.status(statusCode).json({
+  res.status(statusCode).json({
     success: false,
     message,
     statusCode,
     err,
     stack: config.NODE_ENV === 'development' ? err?.stack : null,
   });
+  
+  next();
 };
 
 export default globalErrorHandler;

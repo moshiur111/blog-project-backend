@@ -40,8 +40,6 @@ const updateBlog = async (
     throw new AppError('This user is not found', 404);
   }
 
-  console.log('From blog service =>', user);
-
   const isBlocked = user?.isBlocked;
 
   if (isBlocked) {
