@@ -168,8 +168,6 @@ A consistent error handling mechanism is implemented across the application, wit
 
 ---
 
----
-
 ## 🔗 **Repository and Deployment Link**
 - **GitHub Repository Link:** [Blog Project Backend](https://github.com/moshiur111/blog-project-backend.git)  
 - **Live Deployment Link:** [Live API Link](https://blog-project-backend-theta.vercel.app)  
@@ -182,6 +180,6 @@ A consistent error handling mechanism is implemented across the application, wit
 ---
 
 ## ✍ **Contributors**
-- **Muhammd Moshiur Rhamman** (Repository Author)
+- **Muhammad Moshiur Rhamman** (Repository Author)
 
 ---
