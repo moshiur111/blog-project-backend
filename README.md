@@ -175,7 +175,7 @@ A consistent error handling mechanism is implemented across the application, wit
 ---
 
 ## 🎥 **Project Overview**
-- [Project Explanation Video Link](#)
+- [Project Explanation Video Link](https://drive.google.com/file/d/1uxfnmw03Gpse8n-_J5Tr2UrGLElP03CZ/view?usp=sharing)
 
 ---
 
