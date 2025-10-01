@@ -1,3 +1,4 @@
+import status from 'http-status';
 import config from '../../config';
 import AppError from '../../error/AppError';
 import { User } from '../user/user.model';
@@ -7,7 +8,7 @@ import { createToken } from './auth.utils';
 const registerUser = async (payload: TRegisterUser) => {
   const user = await User.isUserExistsByEmail(payload?.email);
   if (user) {
-    throw new AppError('User is already exists', 400);
+    throw new AppError(status.BAD_REQUEST, 'User is already exists');
   }
   const NewUser = await User.create(payload);
   return NewUser;
@@ -17,22 +18,21 @@ const loginUser = async (payload: TLogingUser) => {
   const user = await User.isUserExistsByEmail(payload?.email);
 
   if (!user) {
-    throw new AppError('This user is not found', 404);
+    throw new AppError(status.NOT_FOUND, 'This user is not found');
   }
 
   const isBlocked = user?.isBlocked;
 
   if (isBlocked) {
-    throw new AppError('This user is blocked', 403);
+    throw new AppError(status.FORBIDDEN, 'This user is blocked');
   }
 
-
   if (!(await User.isPasswordMatched(payload?.password, user.password))) {
-    throw new AppError('This password is not matched', 403);
+    throw new AppError(status.FORBIDDEN, 'This password is not matched');
   }
 
   const jwtPayload = {
-    userId: user._id,
+    userId: user._id.toString(),
     role: user.role,
   };
 
@@ -42,7 +42,13 @@ const loginUser = async (payload: TLogingUser) => {
     config.jwt_access_expires_in as string,
   );
 
-  return accessToken;
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  );
+
+  return { accessToken, refreshToken };
 };
 
 export const AuthServices = {
