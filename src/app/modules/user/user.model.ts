@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { model, Schema } from 'mongoose';
 import { TUser, UserModel } from './user.interface';
@@ -28,7 +29,7 @@ const userSchema = new Schema<TUser, UserModel>(
     password: {
       type: String,
       required: [true, 'Password is required'],
-      select: 0,
+      select: false,
     },
     role: {
       type: String,
@@ -45,11 +46,18 @@ const userSchema = new Schema<TUser, UserModel>(
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        delete (ret as any).password;
+        return ret;
+      },
+    },
   },
 );
 
 userSchema.pre('save', async function (next) {
   const user = this;
+  if (!user.isModified('password')) return next();
   user.password = await bcrypt.hash(
     user.password,
     Number(config.bcrypt_salt_rounds),
