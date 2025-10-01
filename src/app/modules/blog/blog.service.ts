@@ -1,22 +1,23 @@
 import { JwtPayload } from 'jsonwebtoken';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
-import { blogConstant } from './blog.constant';
+import { blogSearchableFields } from './blog.constant';
 import { TBlog } from './blog.interface';
 import { Blog } from './blog.model';
 import { User } from '../user/user.model';
+import status from 'http-status';
 
 const createBlog = async (userData: JwtPayload, payload: TBlog) => {
   const user = await User.findById(userData.userId);
 
   if (!user) {
-    throw new AppError('This user is not found', 404);
+    throw new AppError(status.NOT_FOUND, 'This user is not found');
   }
 
   const isBlocked = user?.isBlocked;
 
   if (isBlocked) {
-    throw new AppError('This user is blocked', 403);
+    throw new AppError(status.FORBIDDEN, 'This user is blocked');
   }
 
   const blogData = {
@@ -37,23 +38,26 @@ const updateBlog = async (
   const user = await User.findById(userData.userId);
 
   if (!user) {
-    throw new AppError('This user is not found', 404);
+    throw new AppError(status.NOT_FOUND, 'This user is not found');
   }
 
   const isBlocked = user?.isBlocked;
 
   if (isBlocked) {
-    throw new AppError('This user is blocked', 403);
+    throw new AppError(status.FORBIDDEN, 'This user is blocked');
   }
 
   const blog = await Blog.findById(id);
 
   if (!blog) {
-    throw new AppError('This blog does not exits', 404);
+    throw new AppError(status.NOT_FOUND, 'This blog does not exits');
   }
 
   if (user._id.toString() !== blog.author.toString()) {
-    throw new AppError('This is not a valid author for this blog', 403);
+    throw new AppError(
+      status.FORBIDDEN,
+      'This is not a valid author for this blog',
+    );
   }
 
   const updatedBlog = await Blog.findByIdAndUpdate(id, payload, {
@@ -64,44 +68,55 @@ const updateBlog = async (
 };
 
 const deleteBlog = async (userData: JwtPayload, id: string) => {
-
   const user = await User.findById(userData.userId);
 
   if (!user) {
-    throw new AppError('This user is not found', 404);
+    throw new AppError(status.NOT_FOUND, 'This user is not found');
   }
 
   const isBlocked = user?.isBlocked;
 
   if (isBlocked) {
-    throw new AppError('This user is blocked', 403);
+    throw new AppError(status.FORBIDDEN, 'This user is blocked');
   }
 
   const blog = await Blog.findById(id);
 
   if (!blog) {
-    throw new AppError('This blog does not exits', 404);
+    throw new AppError(status.NOT_FOUND, 'This blog does not exits');
   }
 
   if (user._id.toString() !== blog.author.toString()) {
-    throw new AppError('This is not a valid author for this blog', 403);
+    throw new AppError(
+      status.FORBIDDEN,
+      'This is not a valid author for this blog',
+    );
   }
-  
+
   await Blog.findByIdAndDelete(id);
 
   return {};
 };
 
 const getAllBlogs = async (query: Record<string, unknown>) => {
-  const blogsQuery = new QueryBuilder(Blog.find().populate('author'), query)
-    .search(blogConstant)
-    .filter('author')
+const baseQuery = Blog.find()
+  .populate({
+    path: 'author',
+    match: { isBlocked: false },
+  })
+
+  const blogsQuery = new QueryBuilder(baseQuery, query)
+    .search(blogSearchableFields)
+    .filter()
     .sort();
 
-  const blogs = await blogsQuery.modelQuery;
+  const result = await blogsQuery.modelQuery;
 
-  return blogs;
+  const filteredResult = result.filter((blog) => blog.author);
+
+  return filteredResult;
 };
+
 
 export const BlogServices = {
   createBlog,

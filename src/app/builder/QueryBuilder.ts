@@ -22,11 +22,16 @@ class QueryBuilder<T> {
     return this;
   }
 
-  filter(filterField: string) {
-    const filterValue = this.query?.filter;
-    if (filterValue) {
-      this.modelQuery = this.modelQuery.find({ [filterField]: filterValue });
-    }
+  filter(allowedFields: string[] = ['author']) {
+    const queryObj = { ...this.query };
+    const excludeFields = ['search', 'sortBy', 'sortOrder', 'page', 'limit'];
+    excludeFields.forEach((field) => delete queryObj[field]);
+
+    Object.keys(queryObj).forEach((key) => {
+      if (!allowedFields.includes(key)) delete queryObj[key];
+    });
+
+    this.modelQuery = this.modelQuery.find(queryObj);
     return this;
   }
 
