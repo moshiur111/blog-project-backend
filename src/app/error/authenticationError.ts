@@ -1,9 +1,9 @@
 import AppError from './AppError';
 
-class authenticationError extends AppError {
-  constructor(message: string = 'Authenticaton Failed') {
-    super(message, 401);
+class AuthenticationError extends AppError {
+  constructor(message: string = 'Authentication Failed') {
+    super(401, message);
   }
 }
 
-export default authenticationError;
+export default AuthenticationError;
